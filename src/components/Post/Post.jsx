@@ -1,4 +1,5 @@
 import { Avatar } from '../Avatar/Avatar';
+import Comment from '../Comment/Comment';
 import styles from './Post.module.css';
 function Post() {
   return (
@@ -19,6 +20,28 @@ function Post() {
 
       <div className={styles.content}>
         <p>lorem ipsum</p>
+      </div>
+
+      <form className={styles.commentForm}>
+        <strong>Deixe seu feedback</strong>
+        <textarea
+          // onChange={handleNewCommentChange}
+          name='comment'
+          // value={newCommentText}
+          placeholder='Deixe seu comentário'
+          //onInvalid={handleNewCommentInvalid}
+          required
+        />
+
+        <footer>
+          <button /* disabled={newCommentText.length === 0} */ type='submit'>
+            Publicar
+          </button>
+        </footer>
+      </form>
+
+      <div className={styles.commentList}>
+        <Comment />
       </div>
     </article>
   );
