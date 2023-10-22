@@ -1,47 +1,83 @@
+import { format, formatDistanceToNow } from 'date-fns';
 import { Avatar } from '../Avatar/Avatar';
 import Comment from '../Comment/Comment';
 import styles from './Post.module.css';
-function Post() {
+import { ptBR } from 'date-fns/locale';
+import { useState } from 'react';
+
+function Post({ author, content, publishedAt }) {
+  const [comments, setComments] = useState(['Post muito legal, hein!']);
+  const [newCommentText, setNewCommentText] = useState('');
+
+  const publishedDateFormatted = format(
+    publishedAt,
+    "d 'de' LLLL 'às' HH:mm'h'",
+    { locale: ptBR }
+  );
+
+  const publishedDateRelativeNow = formatDistanceToNow(publishedAt, {
+    locale: ptBR,
+    addSuffix: true,
+  });
+
+  function handleCreteNewComment() {
+    event.preventDefault();
+    setComments([...comments, newCommentText]);
+    setNewCommentText('');
+  }
+
   return (
     <article className={styles.post}>
       <header>
         <div className={styles.author}>
-          <Avatar src='https://github.com/MatheusGorga.png' />
+          <Avatar src={author.avatarUrl} />
           <div className={styles.authorInfo}>
-            <strong>Matheus</strong>
-            <small>Dev</small>
+            <strong>{author.name}</strong>
+            <small>{author.role}</small>
           </div>
         </div>
 
-        <time title='10 de outubro as 20:20:10' dateTime='2023-10-10 20:20:10'>
-          Publicado a 1h
+        <time
+          title={publishedDateFormatted}
+          dateTime={publishedAt.toISOString()}
+        >
+          {publishedDateRelativeNow}
         </time>
       </header>
 
       <div className={styles.content}>
-        <p>lorem ipsum</p>
+        {content.map((line) => {
+          if (line.type === 'paragraph') {
+            return <p key={Math.random()}>{line.content}</p>;
+          } else if (line.type === 'link') {
+            return (
+              <p key={Math.random()}>
+                <a href=''> {line.content}</a>
+              </p>
+            );
+          }
+        })}
       </div>
 
-      <form className={styles.commentForm}>
+      <form onSubmit={handleCreteNewComment} className={styles.commentForm}>
         <strong>Deixe seu feedback</strong>
         <textarea
-          // onChange={handleNewCommentChange}
           name='comment'
-          // value={newCommentText}
           placeholder='Deixe seu comentário'
-          //onInvalid={handleNewCommentInvalid}
           required
+          value={newCommentText}
+          onChange={(e) => setNewCommentText(e.target.value)}
         />
 
         <footer>
-          <button /* disabled={newCommentText.length === 0} */ type='submit'>
-            Publicar
-          </button>
+          <button type='submit'>Publicar</button>
         </footer>
       </form>
 
       <div className={styles.commentList}>
-        <Comment />
+        {comments.map((comment) => {
+          return <Comment content={comment} />;
+        })}
       </div>
     </article>
   );
